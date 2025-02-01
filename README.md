@@ -1,7 +1,7 @@
-# Google Apps Script - CSV Export System
+# sheet2csv
 
 ## 概要
-本プロジェクトは、Google スプレッドシートから特定のデータを CSV 形式でエクスポートし、Google Drive に保存するシステムです。設定は `Config` シートで管理し、スクリプトを修正せずに運用できます。
+本プロジェクトは、Google スプレッドシートから特定のデータを CSV ファイルとしてエクスポートし、Google Drive に保存するシステムです。設定は `Config` シートで管理し、スクリプトを修正せずに運用できます。
 
 ---
 
@@ -9,7 +9,7 @@
 
 ```
 📂 Google Apps Script Project
- ├── exportFilteredCSV.gs  （CSV エクスポートのメイン処理）
+ ├── exportFilteredCSV.gs   （CSV エクスポートのメイン処理）
  ├── configUtils.gs         （Config シートの設定を取得）
  ├── fileUtils.gs           （Google Drive 操作）
  ├── modalUtils.gs          （モーダル管理）
@@ -38,9 +38,9 @@
 ## 🔧 各スクリプトの説明
 
 ### **1️⃣ exportFilteredCSV.gs**（CSV エクスポートのメイン処理）
-- `Config` シートの設定を取得し、データをフィルタリングして CSV を作成。
+- `Config` シートの設定を取得し、データをフィルタリングして CSV ファイルを作成。
 - `ExportLog` シートにバックアップを保存。
-- Google Drive に CSV をアップロード。
+- Google Drive に CSV ファイルをアップロード。
 - `ExportLogHistory` にダウンロード URL を記録。
 - 対象データの内容をクリア。
 - `showModal()` でユーザーに通知。
@@ -75,25 +75,32 @@
 ---
 
 ## 🚀 Clasp を使用したデプロイ方法
+Google Apps Script のローカル管理には Clasp が必要です。
+**Node.js のインストール** が必要なので、事前に [公式サイト](https://nodejs.org/) からダウンロード＆インストールしてください。
 
 ### **Clasp のセットアップ**
-1. **Clasp のインストール**
+1. **Node.js をインストール**
+   - [公式サイト](https://nodejs.org/) から最新版をダウンロード＆インストール
+
+2. **Clasp をインストール**
    ```sh
    npm install -g @google/clasp
    ```
 
-2. **Google にログイン**
+3. **Google にログイン**
    ```sh
    clasp login
    ```
 
-3. **プロジェクトをクローン**
+4. **プロジェクトをクローン**
+   - `[[scriptId]]` の部分は **Google Apps Script の ID** に置き換えてください：
    ```sh
    clasp clone [[scriptId]]
    ```
 
 ### **スクリプトの更新 & デプロイ**
 1. **ローカルで変更を反映**
+   - `.clasp.json` があるディレクトリで実行：
    ```sh
    clasp push
    ```
@@ -103,15 +110,14 @@
    clasp pull
    ```
 
-
 ---
 
 ## 🎯 まとめ
-✅ **設定は `Config` シートで管理し、スクリプトの編集不要！**
-✅ **Google Drive に CSV を保存し、モーダルでダウンロードリンクを表示！**
-✅ **カラム指定はアルファベット表記で直感的に変更可能！**
-✅ **保護列を指定してデータクリアの安全性を確保！**
-✅ **スプレッドシートのメニューから簡単に CSV エクスポートを実行可能！**
-✅ **Clasp を使用してスクリプトをバージョン管理し、デプロイが可能！**
+ - 設定は `Config` シートで管理し、スクリプトの編集不要
+ - Google Drive に CSV ファイルを保存し、モーダルでダウンロードリンクを表示
+ - カラム指定はアルファベット表記で直感的に変更可能
+ - 保護列を指定してデータクリアの安全性を確保
+ - スプレッドシートのメニューから簡単に CSV エクスポートを実行可能
+ - Clasp を使用してスクリプトをバージョン管理し、デプロイが可能
 
 ---
