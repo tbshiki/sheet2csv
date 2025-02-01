@@ -74,6 +74,6 @@ function exportFilteredCSV() {
   clearSheetData(sheet, filteredData, protectedColumns);
 
   // **ダウンロードリンクをモーダルで表示**
-  showModal(`CSVファイルが作成されました。<br>
-    <a href="${downloadUrl}" target="_blank" download="${fileName}">[CSVをダウンロード]</a>`);
+  showModal("CSVファイルが作成されました。", downloadUrl, fileName);
+
 }
