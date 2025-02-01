@@ -21,21 +21,16 @@ function exportFilteredCSV() {
     return;
   }
 
-  var backupSheet = ss.getSheetByName(sheetNames.backup);
-  if (!backupSheet) {
-    backupSheet = ss.insertSheet(sheetNames.backup);
-  }
-
-  var historySheet = ss.getSheetByName(sheetNames.history);
-  if (!historySheet) {
-    historySheet = ss.insertSheet(sheetNames.history);
+  var backupSheet = ss.getSheetByName(sheetNames.backup) || ss.insertSheet(sheetNames.backup);
+  var historySheet = ss.getSheetByName(sheetNames.history) || ss.insertSheet(sheetNames.history);
+  if (historySheet.getLastRow() === 0) {
     historySheet.appendRow(["Download URL", "Timestamp"]); // ヘッダーを追加
   }
 
   var data = sheet.getDataRange().getValues();
   var header = data[0]; // シートのヘッダー（1行目）
 
-  // 2行目以降で対象列（B列）に値がある行をフィルタリング
+  // **対象列（B列）でデータのある行をフィルタリング**
   var filteredData = data.filter((row, index) => index !== 0 && row[targetColumnIndex - 1]);
   if (filteredData.length === 0) {
     return showModal("エクスポートするデータがありません。");
@@ -43,10 +38,10 @@ function exportFilteredCSV() {
 
   // **バックアップ用シートへデータを最初に移動**
   if (backupSheet.getLastRow() === 0) {
-    backupSheet.appendRow(header);
+    backupSheet.appendRow(header); // ヘッダーをコピー（最初の行がない場合）
   }
 
-  backupSheet.insertRows(2, filteredData.length);
+  backupSheet.insertRows(2, filteredData.length); // 2行目に新規行を追加
   var insertedRange = backupSheet.getRange(2, 1, filteredData.length, filteredData[0].length);
   insertedRange.setValues(filteredData);
 
@@ -56,35 +51,27 @@ function exportFilteredCSV() {
   // **背景色の適用**
   insertedRange.setBackground(firstRowBackground === "#ffffff" || firstRowBackground === "" ? "#f3f3f3" : "#ffffff");
 
-  // **CSVデータ作成（バックアップ完了後に実施）**
+  // **CSVデータ作成**
   var csvData = [header].concat(filteredData);
   var csvContent = csvData.map(row => row.join(",")).join("\n");
 
   // タイムスタンプ付きファイル名
   var timestamp = new Date();
-  var formattedTimestamp = Utilities.formatDate(timestamp, Session.getScriptTimeZone(), "yyyy/MM/dd HH:mm:ss");
   var fileName = `filtered_export_${Utilities.formatDate(timestamp, Session.getScriptTimeZone(), "yyyyMMdd_HHmmss")}.csv`;
 
-  // Google Drive に保存
+  // **Google Drive に保存**
   var folder = getOrCreateFolder(folderName);
   var file = folder.createFile(fileName, csvContent, MimeType.CSV);
   var fileId = file.getId();
   var downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
 
-  // **ログシートへ記録**
+  // **ログシート `ExportLogHistory` へ記録（2行目に挿入）**
   historySheet.insertRowBefore(2);
   historySheet.getRange(2, 1, 1, 2).setValues([[downloadUrl, timestamp]]);
   historySheet.getRange(2, 2).setNumberFormat("yyyy/MM/dd HH:mm:ss");
 
-  // **元データのクリア（バックアップと CSV 生成後に実行）**
-  var rowsToDelete = filteredData.map(row => data.indexOf(row) + 1);
-  rowsToDelete.forEach(rowNum => {
-    for (var col = 1; col <= sheet.getLastColumn(); col++) {
-      if (!protectedColumns.includes(col)) {
-        sheet.getRange(rowNum, col).clearContent();
-      }
-    }
-  });
+  // **データのクリア（最適化済み）**
+  clearSheetData(sheet, filteredData, protectedColumns);
 
   // **ダウンロードリンクをモーダルで表示**
   showModal(`CSVファイルが作成されました。<br>
