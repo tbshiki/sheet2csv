@@ -1,19 +1,18 @@
 function exportFilteredCSV() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
 
-  // === シート名（管理しやすく変更可能） ===
+  // === 設定を `Config` シートから取得 ===
+  var config = getConfigSettings(ss);
+
   var sheetNames = {
-    input: "InputData",        // 入力用シート
-    backup: "ExportLog",       // バックアップ用シート
-    history: "ExportLogHistory" // CSV出力ログ用シート
+    input: config.inputSheet,        // 入力用シート
+    backup: config.backupSheet,       // バックアップ用シート
+    history: config.historySheet      // CSV出力ログ用シート
   };
 
-  // === データの処理対象列 ===
-  var targetColumnIndex = 2; // B列を基準（1-indexed）
-  var protectedColumns = [1, 3, 7, 21, 22]; // A, C, G, U, V列（1-indexed）
-
-  // === 保存フォルダ名 ===
-  var folderName = "CSV_Exports";
+  var targetColumnIndex = config.targetColumnIndex; // データの処理対象列（B列など）
+  var protectedColumns = config.protectedColumns;   // 保護列（編集不可の列）
+  var folderName = config.folderName;               // CSVファイルの保存フォルダ名
 
   var sheet = ss.getSheetByName(sheetNames.input);
   if (!sheet) {
@@ -30,7 +29,7 @@ function exportFilteredCSV() {
   var data = sheet.getDataRange().getValues();
   var header = data[0]; // シートのヘッダー（1行目）
 
-  // **対象列（B列）でデータのある行をフィルタリング**
+  // **対象列のデータがある行をフィルタリング**
   var filteredData = data.filter((row, index) => index !== 0 && row[targetColumnIndex - 1]);
   if (filteredData.length === 0) {
     return showModal("エクスポートするデータがありません。");
@@ -75,5 +74,4 @@ function exportFilteredCSV() {
 
   // **ダウンロードリンクをモーダルで表示**
   showModal("CSVファイルが作成されました。", downloadUrl, fileName);
-
 }
