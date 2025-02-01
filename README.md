@@ -15,6 +15,7 @@
  ├── modalUtils.gs          （モーダル管理）
  ├── dataUtils.gs           （データ処理関数）
  ├── menuUtils.gs           （実行メニュー追加）
+ ├── .clasp.json            （Clasp 設定ファイル）
 ```
 
 ---
@@ -66,40 +67,42 @@
   - Google スプレッドシートの UI に `add-on` メニューを追加。
   - `CSVをエクスポート` メニューから `exportFilteredCSV()` を実行可能。
 
----
-
-## 🚀 設定変更方法
-スクリプトを編集せずに、`Config` シートの値を変更するだけで以下の設定が可能です。
-- **データの取得元のシートを変更** → `inputSheet`
-- **バックアップの保存先を変更** → `backupSheet`
-- **ログ記録のシートを変更** → `historySheet`
-- **Google Drive の保存フォルダを変更** → `folderName`
-- **対象列を変更（例: B → C）** → `targetColumnIndex`
-- **編集不可の列を変更（例: A,C,G,U,V → D,E,F）** → `protectedColumns`
+### **7️⃣ .clasp.json**（Clasp 設定ファイル）
+- Google Apps Script をローカル環境で管理し、Git 連携やデプロイを可能にする設定ファイル。
+- `scriptId` は Google Apps Script のプロジェクト ID。
+- `rootDir` はローカルのスクリプトディレクトリを指定。
 
 ---
 
-## ⚡ 実行手順
-1. **Google スプレッドシートを開く**
-2. **必要に応じて `Config` シートの設定を変更**
-3. **スクリプトを実行（`exportFilteredCSV()` を実行）**
-4. **モーダルでダウンロードリンクが表示される**
-5. **Google Drive に CSV が保存される**
+## 🚀 Clasp を使用したデプロイ方法
 
----
+### **Clasp のセットアップ**
+1. **Clasp のインストール**
+   ```sh
+   npm install -g @google/clasp
+   ```
 
-## 🛠 よくある質問（FAQ）
-### **Q1: 設定を変更しても反映されません。**
-- `Config` シートのキー名が正しく入力されているか確認してください。
-- 設定を更新後、スクリプトを再実行してください。
+2. **Google にログイン**
+   ```sh
+   clasp login
+   ```
 
-### **Q2: CSV ダウンロードのボタンが反応しません。**
-- Google Apps Script のポップアップブロックが原因の可能性があります。
-- `window.open(downloadUrl, '_blank')` を使用して開く設計になっています。
+3. **プロジェクトをクローン**
+   ```sh
+   clasp clone [[scriptId]]
+   ```
 
-### **Q3: 設定を増やしたい場合は？**
-- `Config` シートに新しい設定を追加。
-- `configUtils.gs` に新しい設定の読み取り処理を追加。
+### **スクリプトの更新 & デプロイ**
+1. **ローカルで変更を反映**
+   ```sh
+   clasp push
+   ```
+
+2. **Apps Script エディタで変更を取得**
+   ```sh
+   clasp pull
+   ```
+
 
 ---
 
@@ -109,5 +112,6 @@
 ✅ **カラム指定はアルファベット表記で直感的に変更可能！**
 ✅ **保護列を指定してデータクリアの安全性を確保！**
 ✅ **スプレッドシートのメニューから簡単に CSV エクスポートを実行可能！**
+✅ **Clasp を使用してスクリプトをバージョン管理し、デプロイが可能！**
 
 ---
